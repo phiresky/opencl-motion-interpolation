@@ -32,7 +32,7 @@ title: Motion Interpolation with OpenCL
 
 ## Example
 
-<video src="media/ball-small.mp4" loop></video>
+<video data-src="media/ball-small.mp4" loop></video>
 
 ## Motivation / Prior Art
 
@@ -90,7 +90,7 @@ For every OpenCL local 2D group:
 
 ## Motion Vectors
 
-<video src="media/mvecs-small.mp4" loop></video>
+<video data-src="media/mvecs-small.mp4" loop></video>
 
 ## Diamond Block Search
 
@@ -107,23 +107,23 @@ Exhaustive search is slow. Lots of research on search patterns.
 
 ## Shift Forward Motion Vectors
 
-<video src="media/shifted-mvecs-small.mp4" loop></video>
+<video data-src="media/shifted-mvecs-small.mp4" loop></video>
 
 ## Rendered
 
-<video src="media/mvecs-render-small.mp4" loop></video>
+<video data-src="media/mvecs-render-small.mp4" loop></video>
 
 ## Full Debug Output
 
-<video src="media/2020-01-07-debug1-small.mp4" loop></video>
+<video data-src="media/2020-01-07-debug1-small.mp4" loop></video>
 
 ## Movie Example 1 (slowed 50%) {.nospace}
 
-<video src="media/movie-example1-small.mp4" loop></video>
+<video data-src="media/movie-example1-small.mp4" loop></video>
 
 ## Movie Example 2 (slowed 50%) {.nospace}
 
-<video src="media/movie-example2-small.mp4" loop></video>
+<video data-src="media/movie-example2-small.mp4" loop></video>
 
 ## Benchmark
 
