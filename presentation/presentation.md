@@ -32,7 +32,7 @@ title: Motion Interpolation with OpenCL
 
 ## Example
 
-<video src="show/ball.mp4" loop></video>
+<video src="media/ball-small.mp4" loop></video>
 
 ## Motivation / Prior Art
 
@@ -67,36 +67,36 @@ For every OpenCL local 2D group:
 
 ##
 
-![](1.svg){width=70% .noborder}
+![](media/1.svg){width=70% .noborder}
 
 ## {transition=none}
 
-![](4.svg){width=70% .noborder}
+![](media/4.svg){width=70% .noborder}
 
 ## {transition=none}
 
-![](2.svg){width=70% .noborder}
+![](media/2.svg){width=70% .noborder}
 
 ## Motion Estimation Example
 
 :::::::::::::: {.columns}
 ::: {.column width="50%"}
-![1 iteration](show/iter-1.png){width=90%}
+![1 iteration](media/iter-1.png){width=90%}
 :::
 ::: {.column width="50%" .fragment}
-![5 iterations](show/iter-2.png){width=90%}
+![5 iterations](media/iter-2.png){width=90%}
 :::
 ::::::::::::::
 
 ## Motion Vectors
 
-<video src="show/mvecs.mp4" loop></video>
+<video src="media/mvecs-small.mp4" loop></video>
 
 ## Diamond Block Search
 
 Exhaustive search is slow. Lots of research on search patterns.
 
-![<small>Zhu, Ma: A new-diamond search algorithm for fast block-matching motion estimation (2000)</small>](show/diamond.png){width=40%}
+![<small>Zhu, Ma: A new-diamond search algorithm for fast block-matching motion estimation (2000)</small>](media/diamond.png){width=40%}
 
 ## Frame Rendering
 
@@ -107,38 +107,37 @@ Exhaustive search is slow. Lots of research on search patterns.
 
 ## Shift Forward Motion Vectors
 
-<video src="show/shifted-mvecs.mp4" loop></video>
+<video src="media/shifted-mvecs-small.mp4" loop></video>
 
 ## Rendered
 
-<video src="show/mvecs-render.mp4" loop></video>
+<video src="media/mvecs-render-small.mp4" loop></video>
 
 ## Full Debug Output
 
-<video src="show/2020-01-07-debug1.mp4" loop></video>
+<video src="media/2020-01-07-debug1-small.mp4" loop></video>
 
 ## Movie Example 1 (slowed 50%) {.nospace}
 
-<video src="show/movie-example1.mp4" loop></video>
+<video src="media/movie-example1-small.mp4" loop></video>
 
 ## Movie Example 2 (slowed 50%) {.nospace}
 
-<video src="show/movie-example2.mp4" loop></video>
+<video src="media/movie-example2-small.mp4" loop></video>
 
 ## Benchmark
 
 Measuring everything between `glFinish()` and `clFinish()`
-##
 
-![](by-method.svg){width=70%}
-
-##
-
-![](by-blocksize.svg){width=70%}
+![](media/by-method.svg){width=70%}
 
 ##
 
-![](by-videosize.svg){width=70%}
+![](media/by-blocksize.svg){width=70%}
+
+##
+
+![](media/by-videosize.svg){width=70%}
 
 ## Link to Code
 
