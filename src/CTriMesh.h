@@ -2,8 +2,7 @@
 This class handles triangle meshes.
 */
 
-#ifndef CTRIMESH_H
-#define CTRIMESH_H
+#pragma once
 
 #ifdef min  // these macros are defined under windows, but collide with our math
             // utility
@@ -18,8 +17,6 @@ This class handles triangle meshes.
 
 #include "GLCommon.h"
 #include "HLSLEx.h"
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 class CTriMesh {
  protected:
@@ -45,7 +42,7 @@ class CTriMesh {
   std::vector<Face> m_Faces;
 
   // transformation
-  // float4x4				m_ModelMatrix;
+  // float4x4 m_ModelMatrix;
 
   // rendering data on the GPU
   GLuint m_glVertexBuffer = 0;
@@ -90,7 +87,3 @@ class CTriMesh {
   // renders the triangles using the current OpenGL program
   void DrawGL(GLenum mode);
 };
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-#endif

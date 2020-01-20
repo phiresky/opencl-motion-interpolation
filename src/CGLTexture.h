@@ -1,11 +1,4 @@
-////////////////////////////////////////////////////////////
-//                                                        //
-//  Simple OpenGL Texture Loader                          //
-//  (w)(c)2007 Carsten Dachsbacher                        //
-//                                                        //
-////////////////////////////////////////////////////////////
-#ifndef __TEXTURE_H
-#define __TEXTURE_H
+#pragma once
 
 #include "GLCommon.h"
 
@@ -19,16 +12,14 @@ class CGLTexture {
   GLuint ID;
 
  public:
-  CGLTexture(bool _rectangular = false);
+  explicit CGLTexture(bool _rectangular = false);
   ~CGLTexture();
 
-  GLuint getID() { return ID - 1; };
-  int getWidth() { return width; };
-  int getHeight() { return height; };
+  GLuint getID() { return ID - 1; }
+  int getWidth() { return width; }
+  int getHeight() { return height; }
 
   bool loadPNG(const char *fileName, bool updateOnly = false);
 
   void bind();
 };
-
-#endif

@@ -9,19 +9,22 @@
 #endif
 
 #include <fstream>
-#include <future>
 #include <png++/error.hpp>
 #include <sstream>
 #include <string>
+#include <utility>
+#include <vector>
 
 #include "CL/cl_gl.h"
 #include "HLSLEx.h"
 #include "MotionInterpolationTask.h"
 #include "util.h"
 
-using namespace std;
+using std::cout;
+using std::endl;
+using std::string;
 
-string applypattern(string &pattern, int i) {
+string applypattern(const string &pattern, int i) {
   char buffer[256];
   snprintf(buffer, sizeof(buffer), pattern.c_str(), i);
   string buffasstr = buffer;
@@ -66,7 +69,8 @@ bool MotionInterpolationTask::InitResources(cl::Device Device,
     m_ImgResY = img.texture->getHeight();
 
     // create cloth model
-    img.clothModel = CTriMesh::CreatePlane(2, 2, (float)m_ImgResX / m_ImgResY);
+    img.clothModel =
+        CTriMesh::CreatePlane(2, 2, static_cast<float>(m_ImgResX) / m_ImgResY);
     if (!img.clothModel) {
       cout << "Failed to create cloth." << endl;
       return false;
@@ -136,7 +140,7 @@ bool MotionInterpolationTask::InitResources(cl::Device Device,
   }
 
   string programCode = util::loadFileToString("motion.cl");
-  stringstream compileOptions;
+  std::stringstream compileOptions;
   compileOptions << " -D TILE_X=" << m_LocalWorkSize[0]
                  << " -D TILE_Y=" << m_LocalWorkSize[1]
                  << " -D USE_DIAMOND=" << m_UseDiamond;
@@ -198,8 +202,8 @@ void MotionInterpolationTask::PreloadImages(int count) {
 }
 void MotionInterpolationTask::LoadMarchImage(cl::Context Context) {
   float simulSecs;
-  float simulMod = modf(m_simulationTime, &simulSecs);
-  if ((int)simulSecs == m_MarchOffset + m_MarchIdx) return;
+  float simulMod = std::modf(m_simulationTime, &simulSecs);
+  if (static_cast<int>(simulSecs) == m_MarchOffset + m_MarchIdx) return;
   m_MarchIdx = simulSecs - m_MarchOffset;
   int start_img = m_FrameStart;
   int leftFrameIdx = m_MarchIdx + start_img;
@@ -213,16 +217,16 @@ void MotionInterpolationTask::LoadMarchImage(cl::Context Context) {
   for (; i < 2; i++) {
     auto &image = m_images[i];
     image.frameIdx = leftFrameIdx + i;
-    if (m_FrameTextures.count(image.frameIdx))
+    if (m_FrameTextures.count(image.frameIdx)) {
       image.texture = m_FrameTextures[image.frameIdx];
-    else {
+    } else {
       auto txt = loadPngNow(m_MovieClipPattern, image.frameIdx);
       if (txt != nullptr) {
         image.texture = txt;
         m_FrameTextures[image.frameIdx] = image.texture;
       } else {
         int bef = m_MarchOffset;
-        m_MarchOffset = (int)m_simulationTime;
+        m_MarchOffset = static_cast<int>(m_simulationTime);
         printf("error loading png, restarting from start\n");
         if (bef != m_MarchOffset) {
           LoadMarchImage(Context);
@@ -270,7 +274,7 @@ void MotionInterpolationTask::ReleaseResources() {
 double msTaken = 0;
 int framesRendered = 0;
 
-void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
+void MotionInterpolationTask::ComputeGPU(const cl::Context &Context,
                                          cl::CommandQueue &CommandQueue) {
   // get global work size
   cl::NDRange global =
@@ -282,7 +286,7 @@ void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
   auto start = std::chrono::steady_clock::now();
 
   float simulSecs;
-  float simulMod = modf(m_simulationTime, &simulSecs);
+  float simulMod = std::modf(m_simulationTime, &simulSecs);
   if (m_MarchMode) {
     LoadMarchImage(Context);
   }
@@ -324,7 +328,7 @@ void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
         V_RETURN_CL(error, "EstimateMotion");
         // CommandQueue.finish();
         // printf("EstimateMotion done\n");
-      };
+      }
       {
         // printf("ShiftVectors\n");
         // shift motion vectors
@@ -333,7 +337,7 @@ void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
         fn(CARGS, theta, error);
         V_RETURN_CL(error, "ShiftVectors");
         // printf("ShiftVectors done\n");
-      };
+      }
       {
         // CommandQueue.finish();
         // normalize motion vector image
@@ -341,14 +345,14 @@ void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
         auto &fn = *m_kernelNormalizeMVecs;
         fn(CARGS, error);
         V_RETURN_CL(error, "NormalizeMVecs");
-      };
+      }
       {
         // render frame
         cl_int error;
         auto &fn = *m_kernelRenderFrame;
         fn(CARGS, theta, error);
         V_RETURN_CL(error, "RenderFrame");
-      };
+      }
       if (right) break;
     }
     {
@@ -394,12 +398,12 @@ void MotionInterpolationTask::ComputeGPU(cl::Context &Context,
   m_ElapsedTime = 0;
 }
 
-void MotionInterpolationTask::RenderImg(Triforce &img, float x, float y) {
+void MotionInterpolationTask::RenderImg(const Triforce &img, float x, float y) {
   glPushMatrix();
-  glTranslatef(-(float)m_ImgResX / m_ImgResY / 2, 0.5f, 0.5f);
+  glTranslatef(-static_cast<float>(m_ImgResX) / m_ImgResY / 2, 0.5f, 0.5f);
 
   float gap = 0.01;
-  float xofs = (float)m_ImgResX / m_ImgResY + gap;
+  float xofs = static_cast<float>(m_ImgResX) / m_ImgResY + gap;
   float yofs = 0.5 + gap;
   glTranslatef(x * xofs - xofs / 2, 0, -yofs * (2 * y - 1));
   img.texture->bind();
@@ -500,7 +504,7 @@ void MotionInterpolationTask::OnKeyboard(int Key, int KeyAction) {
     }
     if (Key == GLFW_KEY_M) {
       m_MarchMode = !m_MarchMode;
-      m_MarchOffset = (int)m_simulationTime;
+      m_MarchOffset = static_cast<int>(m_simulationTime);
     }
     if (Key == GLFW_KEY_F) {
       m_FastMode = (m_FastMode + 1) % m_FastModes.size();

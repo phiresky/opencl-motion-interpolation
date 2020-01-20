@@ -1,14 +1,7 @@
-/******************************************************************************
-GPU Computing / GPGPU Praktikum source code.
-
-******************************************************************************/
-
 #include <filesystem>
 #include <iostream>
 
 #include "Wrapper.h"
-
-using namespace std;
 
 int main(int argc, char **argv) {
   auto pAssignment = Wrapper::GetSingleton();
@@ -21,5 +14,3 @@ int main(int argc, char **argv) {
   cin.get();
 #endif
 }
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

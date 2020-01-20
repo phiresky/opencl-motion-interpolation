@@ -7,8 +7,10 @@
 #include <fstream>
 #include <iostream>
 
-using namespace hlsl;
-
+using hlsl::float2;
+using hlsl::float3;
+using hlsl::float4;
+using hlsl::float4x4;
 ////////////////////////////////////////////////////////////////////////////////////////////////////////
 // CTriMesh
 
@@ -234,7 +236,7 @@ bool CTriMesh::CreateGLResources() {
   // Vertex* pVertices = new Vertex[m_Vertices.size()];
   // for(size_t iVert = 0; iVert < m_Vertices.size(); iVert++)
   //{
-  //	pVertices[iVert] = m_Vertices[iVert];
+  // pVertices[iVert] = m_Vertices[iVert];
   //}
   float4 *pVertices = new float4[m_Vertices.size()];
   float4 *pNormals = new float4[m_Vertices.size()];
@@ -311,11 +313,11 @@ void CTriMesh::DrawGL(GLenum mode) {
   glBindBuffer(GL_ARRAY_BUFFER, m_glVertexBuffer);
   glVertexPointer(3, GL_FLOAT, sizeof(float4), 0);
   glBindBuffer(GL_ARRAY_BUFFER, m_glNormalBuffer);
-  glNormalPointer(GL_FLOAT, sizeof(float4), (char *)0);
+  glNormalPointer(GL_FLOAT, sizeof(float4), nullptr);
   glBindBuffer(GL_ARRAY_BUFFER, m_glTexCoordBuffer);
   glClientActiveTexture(GL_TEXTURE0_ARB);
   glEnableClientState(GL_TEXTURE_COORD_ARRAY);
-  glTexCoordPointer(2, GL_FLOAT, sizeof(float2), (char *)0);
+  glTexCoordPointer(2, GL_FLOAT, sizeof(float2), nullptr);
 
   CHECK_FOR_OGL_ERROR();
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_glIndexBuffer);
@@ -338,18 +340,18 @@ GLuint CTriMesh::GetNormalBuffer() const { return m_glNormalBuffer; }
 
 // void CTriMesh::SetTransform(const float4x4& Matrix)
 //{
-//	m_ModelMatrix = Matrix;
+// m_ModelMatrix = Matrix;
 //}
 //
 // const float4x4* CTriMesh::GetTransform() const
 //{
-//	return &m_ModelMatrix;
+// return &m_ModelMatrix;
 //}
 
 void CTriMesh::GetTriangleSoup(float **ppPositionBuffer,
                                unsigned int *pNumTriangles) {
   *ppPositionBuffer = new float[4 * 3 * m_Faces.size()];
-  float4 *pPositionBuffer = (float4 *)*ppPositionBuffer;
+  float4 *pPositionBuffer = reinterpret_cast<float4 *>(*ppPositionBuffer);
   *pNumTriangles = m_Faces.size();
 
   // transform all the vertices to world space before copying

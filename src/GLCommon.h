@@ -1,12 +1,10 @@
 #pragma once
 
+// clang-format off
 #include "GL/glew.h"
 
-// for using OpenGL
 #include <GLFW/glfw3.h>
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// OpenGL utility functions
+// clang-format on
 
 bool CreateShaderFromFile(const char *Path, GLhandleARB shader);
 

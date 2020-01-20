@@ -1,10 +1,3 @@
-////////////////////////////////////////////////////////////
-//                                                        //
-//  Simple OpenGL Texture Loader                          //
-//  (w)(c)2007 Carsten Dachsbacher                        //
-//                                                        //
-////////////////////////////////////////////////////////////
-
 #include "CGLTexture.h"
 
 #include <stdio.h>

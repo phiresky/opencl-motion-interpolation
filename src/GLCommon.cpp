@@ -1,16 +1,6 @@
-/******************************************************************************
-GPU Computing / GPGPU Praktikum source code.
-
-******************************************************************************/
-
 #include "GLCommon.h"
 
 #include <iostream>
-
-using namespace std;
-
-/////////////////////////////////////////////////////////////////////////////////////////////////////
-// OpenGL utility functions
 
 void LoadProgram(const char *Path, char **pSource, size_t *SourceSize) {
   FILE *pFileStream = NULL;
@@ -24,7 +14,7 @@ void LoadProgram(const char *Path, char **pSource, size_t *SourceSize) {
 #else  // Linux version
   pFileStream = fopen(Path, "rb");
   if (pFileStream == 0) {
-    cout << "File not found: " << Path << endl;
+    std::cout << "File not found: " << Path << std::endl;
     return;
   }
 #endif
@@ -53,7 +43,7 @@ bool CreateShaderFromFile(const char *Path, GLhandleARB shader) {
 
   if (!CompileGLSLShader(shader)) {
     delete[] sourceCode;
-    cout << "Failed to compile shader: " << Path << endl;
+    std::cout << "Failed to compile shader: " << Path << std::endl;
     return false;
   }
 
@@ -69,9 +59,9 @@ bool CompileGLSLShader(GLhandleARB obj) {
   if (success == GL_FALSE) {
     int infoLogLength = 0;
     char infoLog[1024];
-    cout << "There were compile errors:" << endl;
+    std::cout << "There were compile errors:" << std::endl;
     glGetShaderInfoLog(obj, 1024, &infoLogLength, infoLog);
-    if (infoLogLength > 0) cout << infoLog << endl;
+    if (infoLogLength > 0) std::cout << infoLog << std::endl;
 
     return false;
   }
@@ -91,9 +81,9 @@ bool LinkGLSLProgram(GLhandleARB program) {
   if (success == GL_FALSE) {
     int infoLogLength = 0;
     char infoLog[1024];
-    cout << "There were link errors:" << endl;
+    std::cout << "There were link errors:" << std::endl;
     glGetProgramInfoLog(program, 1024, &infoLogLength, infoLog);
-    if (infoLogLength > 0) cout << infoLog << endl;
+    if (infoLogLength > 0) std::cout << infoLog << std::endl;
 
     return false;
   }

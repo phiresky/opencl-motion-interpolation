@@ -3,6 +3,7 @@
 #define IMG_CUNT 11
 
 #include <array>
+#include <string>
 #include <unordered_map>
 
 #include "CGLTexture.h"
@@ -29,7 +30,7 @@ struct Triforce {
 
 class MotionInterpolationTask {
  public:
-  MotionInterpolationTask(MotionInterpolationArgs);
+  explicit MotionInterpolationTask(MotionInterpolationArgs);
 
   virtual ~MotionInterpolationTask();
 
@@ -39,15 +40,12 @@ class MotionInterpolationTask {
 
   virtual void ReleaseResources();
 
-  virtual void ComputeGPU(cl::Context &Context, cl::CommandQueue &CommandQueue);
-  // Not implemented!
-  virtual void ComputeCPU(){};
-  virtual bool ValidateResults() { return false; };
+  virtual void ComputeGPU(const cl::Context &Context,
+                          cl::CommandQueue &CommandQueue);
 
-  // IGUIEnabledComputeTask
   virtual void Render();
 
-  virtual void RenderImg(Triforce &img, float x, float y);
+  virtual void RenderImg(const Triforce &img, float x, float y);
 
   virtual void OnKeyboard(int Key, int Action);
 

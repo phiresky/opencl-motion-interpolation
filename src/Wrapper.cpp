@@ -4,6 +4,7 @@
 
 #include <iostream>
 #include <string>
+#include <vector>
 
 #include "CLUtil.h"
 #include "GLCommon.h"
@@ -13,8 +14,6 @@
 #ifdef __linux__
 #include <GL/glx.h>
 #endif
-
-using namespace std;
 
 ///////////////////////////////////////////////////////////////////////////////
 // Wrapper
@@ -47,12 +46,12 @@ bool Wrapper::EnterMainLoop(int argc, char **argv) {
     return false;
   }
   util::set_exe_path(argv[0]);
-  m_pCurrentTask = new MotionInterpolationTask(
-      MotionInterpolationArgs{.clip = argv[1],
-                              .framestart = std::stoi(argv[2]),
-                              .localSize = std::stoi(argv[3]),
-                              .useDiamond = bool(std::stoi(argv[4])),
-                              .mvecIters = std::stoi(argv[5])});
+  m_pCurrentTask = new MotionInterpolationTask(MotionInterpolationArgs{
+      .clip = argv[1],
+      .framestart = std::stoi(argv[2]),
+      .localSize = std::stoi(argv[3]),
+      .useDiamond = static_cast<bool>(std::stoi(argv[4])),
+      .mvecIters = std::stoi(argv[5])});
   // create CL context with GL context sharing
   if (InitGL(argc, argv) && InitCLContext()) {
     if (m_pCurrentTask) {
@@ -72,9 +71,10 @@ bool Wrapper::EnterMainLoop(int argc, char **argv) {
 
     // currently broken (causes hang)
     // if (m_pCurrentTask)
-    //	m_pCurrentTask->ReleaseResources();
+    //   m_pCurrentTask->ReleaseResources();
   } else {
-    cerr << "Failed to create GL and CL context, terminating..." << endl;
+    std::cerr << "Failed to create GL and CL context, terminating..."
+              << std::endl;
   }
 
   CleanupGL();
@@ -238,9 +238,9 @@ bool Wrapper::InitGL(int, char **) {
   // initialize necessary OpenGL extensions
   glewInit();
   if (!glewIsSupported("GL_VERSION_2_0 GL_ARB_pixel_buffer_object")) {
-    cout
+    std::cout
         << "Missing OpenGL extension: GL_VERSION_2_0 GL_ARB_pixel_buffer_object"
-        << endl;
+        << std::endl;
     return false;
   }
 
@@ -267,7 +267,7 @@ bool Wrapper::InitGL(int, char **) {
 
   glEnable(GL_TEXTURE_2D);
 
-  cout << "OpenGL context initialized." << endl;
+  std::cout << "OpenGL context initialized." << std::endl;
 
   return true;
 }
@@ -284,6 +284,7 @@ void Wrapper::Render() {
 }
 
 void Wrapper::OnIdle() {
+  using namespace std::chrono_literals;
   if (m_PrevTime.time_since_epoch() == 0ns) {
     m_PrevTime = std::chrono::steady_clock::now();
   } else {
