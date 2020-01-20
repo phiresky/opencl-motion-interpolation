@@ -2,22 +2,19 @@ cmake_minimum_required(VERSION 3.16.2)
 
 project(MotionInterpolation) 
 
-# 🖕🖕🖕🖕🖕🖕
-set(CMAKE_CXX_STANDARD 20)
-set(CMAKE_CXX_STANDARD_REQUIRED ON)
-
 add_executable(MotionInterpolation)
 
-# Search for OpenCL and add paths
+# 🖕🖕🖕🖕🖕🖕
+set_target_properties(MotionInterpolation PROPERTIES
+  CXX_STANDARD 20
+  CXX_STANDARD_REQUIRED ON
+)
+
 find_package(OpenCL REQUIRED)
 find_package(OpenGL REQUIRED)
 find_package(PNG REQUIRED)
 find_package(GLEW REQUIRED)
 find_package(glfw3 3.3 REQUIRED)
-
-set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
-set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 
 set(textfiles
   motion.cl
