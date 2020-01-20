@@ -1,0 +1,22 @@
+https://github.com/mbdriscoll/examples
+
+https://en.wikipedia.org/wiki/Block-matching_algorithm
+
+http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.330.3947&rep=rep1&type=pdf
+
+
+https://github.com/kipr/opencv/blob/31450d613c0c091c6ad510cf2a42a25edbe01e62/modules/ocl/src/interpolate_frames.cpp
+https://github.com/kipr/opencv/blob/31450d613c0c091c6ad510cf2a42a25edbe01e62/modules/ocl/src/kernels/interpolate_frames.cl
+
+presentation:
+
+perf:
+
+execution of everything (motion estimation, vector transformation, blending, rendering) (everything between glFinish() and clFinish()) takes around
+4.6ms on my (good) GPU. This means we can render 200Hz+ in real time.
+
+glFinish
+future:
+
+- subpixel vectors and rendering
+- mixing vectors is not that smart

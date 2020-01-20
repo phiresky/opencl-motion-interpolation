@@ -1,0 +1,219 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta name="generator" content="pandoc">
+  <title>Motion Interpolation with OpenCL</title>
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, minimal-ui">
+  <link rel="stylesheet" href="reveal.js/css/reset.css">
+  <link rel="stylesheet" href="reveal.js/css/reveal.css">
+  <style>
+    code{white-space: pre-wrap;}
+    span.smallcaps{font-variant: small-caps;}
+    span.underline{text-decoration: underline;}
+    div.column{display: inline-block; vertical-align: top; width: 50%;}
+    div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+    ul.task-list{list-style: none;}
+  </style>
+  <link rel="stylesheet" href="reveal.js/css/theme/white.css" id="theme">
+  <!-- Printing and PDF exports -->
+  <script>
+    var link = document.createElement( 'link' );
+    link.rel = 'stylesheet';
+    link.type = 'text/css';
+    link.href = window.location.search.match( /print-pdf/gi ) ? 'reveal.js/css/print/pdf.css' : 'reveal.js/css/print/paper.css';
+    document.getElementsByTagName( 'head' )[0].appendChild( link );
+  </script>
+  <!--[if lt IE 9]>
+  <script src="reveal.js/lib/js/html5shiv.js"></script>
+  <![endif]-->
+  <style>
+  img { max-height:600px !important; }
+  video { max-height:600px !important; }
+  .reveal section.nospace video { max-height:700px !important; }
+  .reveal .slides > section.nospace, .reveal .slides > section > section.nospace {
+      padding: 0 0;
+  }
+  /*.reveal h1 { font-size: 1.5em; }*/
+  .reveal section.nospace h2 {
+      font-size: 1.1em;
+      margin: 0;
+  }
+  iframe {
+      width: 1024px; height: 768px;
+  }
+  .reveal section img.noborder {
+      border: none;
+  }
+  </style>
+</head>
+<body>
+  <div class="reveal">
+    <div class="slides">
+
+<section id="title-slide">
+  <h1 class="title">Motion Interpolation with OpenCL</h1>
+</section>
+
+<section id="example" class="slide level2">
+<h2>Example</h2>
+<video src="show/ball.mp4" loop>
+</video>
+</section>
+<section id="motivation-prior-art" class="slide level2">
+<h2>Motivation / Prior Art</h2>
+<ul>
+<li class="fragment">Why? 60 &gt; 24. Panning in movies looks horrible</li>
+<li class="fragment">TV features like Motion Boost / TruMotion (controversial)</li>
+<li class="fragment">Smooth Video Project (<a href="svp-team.com">svp-team.com</a>)</li>
+<li class="fragment">Video Compression</li>
+<li class="fragment">Slow Motion in Adobe Premiere etc.</li>
+</ul>
+</section>
+<section id="overview" class="slide level2">
+<h2>Overview</h2>
+<ol type="1">
+<li class="fragment"><p>Motion Estimation via Block Matching:</p>
+<p>Find most similar 16x16 pixel block close to current block</p></li>
+<li class="fragment"><p>Render Frame</p>
+<p>Move by motion vectors and blend blocks</p></li>
+</ol>
+<div class="fragment">
+<p>All videos are screen recordings (real time!)</p>
+</div>
+</section>
+<section id="motion-estimation" class="slide level2">
+<h2>Motion Estimation</h2>
+<p>For every OpenCL local 2D group:</p>
+<ul>
+<li class="fragment">Load a 3x3 grid of 16x16 blocks of both images into local memory</li>
+<li class="fragment">Compute the SAD for moving the center block to every possible offset <small>(Sum of absolute differences)</small></li>
+<li class="fragment">Bias for e.g. consistency with neighbourhood</li>
+<li class="fragment">Do everything a second time for backwards motion</li>
+</ul>
+</section>
+<section id="section" class="slide level2">
+<h2></h2>
+<p><img data-src="1.svg" class="noborder" style="width:70.0%" /></p>
+</section>
+<section id="section-1" class="slide level2" data-transition="none">
+<h2 data-transition="none"></h2>
+<p><img data-src="4.svg" class="noborder" style="width:70.0%" /></p>
+</section>
+<section id="section-2" class="slide level2" data-transition="none">
+<h2 data-transition="none"></h2>
+<p><img data-src="2.svg" class="noborder" style="width:70.0%" /></p>
+</section>
+<section id="motion-estimation-example" class="slide level2">
+<h2>Motion Estimation Example</h2>
+<div class="columns">
+<div class="column" style="width:50%;">
+<figure>
+<img data-src="show/iter-1.png" style="width:90.0%" alt="" /><figcaption>1 iteration</figcaption>
+</figure>
+</div><div class="column fragment" style="width:50%;">
+<figure>
+<img data-src="show/iter-2.png" style="width:90.0%" alt="" /><figcaption>5 iterations</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="motion-vectors" class="slide level2">
+<h2>Motion Vectors</h2>
+<video src="show/mvecs.mp4" loop>
+</video>
+</section>
+<section id="diamond-block-search" class="slide level2">
+<h2>Diamond Block Search</h2>
+<p>Exhaustive search is slow. Lots of research on search patterns.</p>
+<figure>
+<img data-src="show/diamond.png" style="width:40.0%" alt="" /><figcaption><small>Zhu, Ma: A new-diamond search algorithm for fast block-matching motion estimation (2000)</small></figcaption>
+</figure>
+</section>
+<section id="frame-rendering" class="slide level2">
+<h2>Frame Rendering</h2>
+<ol type="1">
+<li class="fragment">Shift Motion vectors by themselves by some factor depending on time</li>
+<li class="fragment">For every output pixel, read input pixel shifted by negative motion vector * deltatime</li>
+<li class="fragment">Do this four times (img1 forward, img1 backward, img2 forward, img2 backward)</li>
+<li class="fragment">Blend pixels depending on deltatime and visibility</li>
+</ol>
+</section>
+<section id="shift-forward-motion-vectors" class="slide level2">
+<h2>Shift Forward Motion Vectors</h2>
+<video src="show/shifted-mvecs.mp4" loop>
+</video>
+</section>
+<section id="rendered" class="slide level2">
+<h2>Rendered</h2>
+<video src="show/mvecs-render.mp4" loop>
+</video>
+</section>
+<section id="full-debug-output" class="slide level2">
+<h2>Full Debug Output</h2>
+<video src="show/2020-01-07-debug1.mp4" loop>
+</video>
+</section>
+<section id="movie-example-1-slowed-50" class="slide level2 nospace">
+<h2 class="nospace">Movie Example 1 (slowed 50%)</h2>
+<video src="show/movie-example1.mp4" loop>
+</video>
+</section>
+<section id="movie-example-2-slowed-50" class="slide level2 nospace">
+<h2 class="nospace">Movie Example 2 (slowed 50%)</h2>
+<video src="show/movie-example2.mp4" loop>
+</video>
+</section>
+<section id="benchmark" class="slide level2">
+<h2>Benchmark</h2>
+<p>Measuring everything between <code>glFinish()</code> and <code>clFinish()</code> ##</p>
+<p><img data-src="by-method.svg" style="width:70.0%" /></p>
+</section>
+<section id="section-3" class="slide level2">
+<h2></h2>
+<p><img data-src="by-blocksize.svg" style="width:70.0%" /></p>
+</section>
+<section id="section-4" class="slide level2">
+<h2></h2>
+<p><img data-src="by-videosize.svg" style="width:70.0%" /></p>
+</section>
+<section id="link-to-code" class="slide level2">
+<h2>Link to Code</h2>
+<p><a href="https://github.com/phiresky/opencl-motion-interpolation" class="uri">https://github.com/phiresky/opencl-motion-interpolation</a></p>
+</section>
+    </div>
+  </div>
+
+  <script src="reveal.js/js/reveal.js"></script>
+
+  <script>
+
+      // Full list of configuration options available at:
+      // https://github.com/hakimel/reveal.js#configuration
+      Reveal.initialize({
+        // Display a presentation progress bar
+        progress: true, autoPlayMedia: true,
+        // Display the page number of the current slide
+        slideNumber: true,
+        // Push each slide change to the browser history
+        history: true,
+        // The "normal" size of the presentation, aspect ratio will be preserved
+        // when the presentation is scaled to fit different resolutions. Can be
+        // specified using percentage units.
+        width: 1280,
+        height: 720,
+        // Factor of the display size that should remain empty around the content
+        margin: 0.05,
+
+        // Optional reveal.js plugins
+        dependencies: [
+          { src: 'reveal.js/lib/js/classList.js', condition: function() { return !document.body.classList; } },
+          { src: 'reveal.js/plugin/zoom-js/zoom.js', async: true },
+          { src: 'reveal.js/plugin/notes/notes.js', async: true }
+        ]
+      });
+    </script>
+    </body>
+</html>
