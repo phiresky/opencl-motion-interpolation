@@ -2,6 +2,8 @@ cmake_minimum_required(VERSION 3.16.2)
 
 project(MotionInterpolation) 
 
+# set(CMAKE_CXX_CLANG_TIDY clang-tidy -checks=-*,readability-*)
+
 add_executable(MotionInterpolation)
 
 # 🖕🖕🖕🖕🖕🖕

@@ -1,3 +1,8 @@
+Presentation:
+
+https://phiresky.github.io/opencl-motion-interpolation/presentation/presentation.html
+
+
 Needs C++20 compiler (e.g. GCC9 or something)
 
 Original OpenGL/OpenCL wrapper code based on [GPUC](https://cg.ivd.kit.edu/lehre/ws2020/index_2199.php) practical course.
